@@ -3,8 +3,7 @@
 Blokus-AI is an implementation of the Blokus board game environment using the Gymnasium framework. This environment is designed to be used for training AI agents to play Blokus.
 
 <div style="display:flex;">
-  <img src="demo_0.gif" style="flex:1;margin-right:5px;width:45%;" />
-  <img src="demo_1.gif" style="flex:1;margin-left:5px;width:45%;" />
+  <img src="demo_0.gif" style="flex:1;margin-right:5px;width:75%;" />
 </div>
 
 # 🚀 Usage
