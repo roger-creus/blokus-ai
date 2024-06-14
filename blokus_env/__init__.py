@@ -1,5 +1,3 @@
-# blokus_env/__init__.py
-
 from gymnasium.envs.registration import register
 
 register(

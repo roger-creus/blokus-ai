@@ -14,10 +14,9 @@ from torch.utils.tensorboard import SummaryWriter
 from gymnasium import spaces
 # Import the Blokus environment
 from blokus_env.blokus_env import BlokusEnv
-from blokus_env.constants import BOARD_SIZE, NUM_PLAYERS, INITIAL_POSITIONS, PLAYER_COLORS, PIECES
-from IPython import embed
+from blokus_env.constants import BOARD_SIZE, NUM_PLAYERS, PIECES
 
-# Important: Supress the pygame output
+# Important: Supress the pygame output (if no display is available)
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 def record_video_every_fn(episode_id: int) -> bool:

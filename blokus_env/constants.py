@@ -1,5 +1,3 @@
-# blokus_env/constants.py
-
 BOARD_SIZE = 20
 NUM_PLAYERS = 4
 INITIAL_POSITIONS = [(0, 0), (0, 19), (19, 0), (19, 19)]

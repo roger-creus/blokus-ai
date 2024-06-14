@@ -1,14 +1,17 @@
-# agents/random_agent.py
+import blokus_env
+import gymnasium as gym
 
-import random
-import numpy as np
+# Create the environment
+env = gym.make("BlokusEnv-v0", render_mode="human")
 
-class RandomAgent:
-    def __init__(self, env):
-        self.env = env
+# Reset the environment
+obs, _ = env.reset()
+done = False
 
-    def get_action(self, obs):
-        valid_actions = self.env.game_logic.get_valid_actions(self.env.board, self.env.pieces, self.env.current_player)
-        if valid_actions:
-            return random.choice(valid_actions)
-        return None
+while not done:
+    # Take a random action
+    action = env.action_space.sample()
+    obs, reward, term, trunc, info = env.step(action)
+    done = term or trunc
+    # Render the environment
+    env.render()
