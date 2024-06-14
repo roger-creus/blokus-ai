@@ -20,7 +20,7 @@ from blokus_env.constants import BOARD_SIZE, NUM_PLAYERS, PIECES
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 def record_video_every_fn(episode_id: int) -> bool:
-    return episode_id % 25 == 0
+    return episode_id % 3 == 0
 
 @dataclass
 class Args:
