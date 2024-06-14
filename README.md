@@ -2,6 +2,11 @@
 
 Blokus-AI is an implementation of the Blokus board game environment using the Gymnasium framework. This environment is designed to be used for training AI agents to play Blokus.
 
+<div style="display:flex;">
+  <img src="demo_0.gif" style="flex:1;margin-right:5px;" />
+  <img src="demo_1.gif" style="flex:1;margin-left:5px;" />
+</div>
+
 # 🚀 Usage
 
 ```bash
@@ -46,5 +51,5 @@ If you use Blokus-AI in your research, please cite it as follows:
     author = {Roger Creus Castanyer},
     title = {Blokus-AI: A Gymnasium Environment for the Blokus Board Game},
     year = {2024},
-    }
+}
 ```

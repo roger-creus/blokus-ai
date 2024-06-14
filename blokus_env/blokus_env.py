@@ -16,7 +16,7 @@ class BlokusEnv(gym.Env):
         Parameters:
         - render_mode (str): Mode to render with ('human' or 'rgb_array').
         """
-        self.metadata = {'render.modes': ['human', 'rgb_array'], "render_fps": 1}
+        self.metadata = {'render.modes': ['human', 'rgb_array'], "render_fps": 10}
         self.render_mode = render_mode
         super(BlokusEnv, self).__init__()
 
