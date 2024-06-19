@@ -1,5 +1,5 @@
 import numpy as np
-from blokus_env.constants import BOARD_SIZE, PIECES, NUM_PLAYERS, INITIAL_POSITIONS
+from blokus_env.constants import PIECES, BOARD_SIZE, INITIAL_POSITIONS, NUM_PLAYERS
 
 class GameLogic:
     """

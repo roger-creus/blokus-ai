@@ -16,8 +16,10 @@ class BlokusEnv(gym.Env):
         Parameters:
         - render_mode (str): Mode to render with ('human' or 'rgb_array').
         """
-        self.metadata = {'render.modes': ['human', 'rgb_array'], "render_fps": 10}
+        self.metadata = {"render_modes": ['human', 'rgb_array'], "render_fps": 10}
+        assert render_mode in self.metadata['render_modes'], f"Invalid render mode: {render_mode}"
         self.render_mode = render_mode
+        
         super(BlokusEnv, self).__init__()
 
         # Define the observation space: the board state and the pieces each player has
@@ -37,6 +39,11 @@ class BlokusEnv(gym.Env):
             spaces.Discrete(2)             # Vertical flip (0 or 1)
         ))
 
+        # Initialize the score for each player
+        # Logic of the score: +1 points for each square placed
+        self.scores = np.zeros(NUM_PLAYERS, dtype=np.int8)
+
+        # Initialize the game logic and renderer
         self.game_logic = GameLogic()
         self.renderer = Renderer()
         self.reset()
@@ -56,7 +63,7 @@ class BlokusEnv(gym.Env):
         self.board = np.zeros((BOARD_SIZE, BOARD_SIZE), dtype=np.int8)
         self.pieces = np.ones((NUM_PLAYERS, len(PIECES)), dtype=np.int8)
         self.current_player = 1
-        return self._get_observation(), {}
+        return self._get_observation(), {"scores": self.scores}
 
     def step(self, action):
         """
@@ -99,14 +106,17 @@ class BlokusEnv(gym.Env):
             else:
                 piece_name = list(PIECES.keys())[piece_index]
                 reward = len(PIECES[piece_name])
+
+            # Update the score of the player
+            self.scores[self.current_player - 1] += len(PIECES[list(PIECES.keys())[piece_index]])
             
         self.current_player = (self.current_player % NUM_PLAYERS) + 1
         done = self.game_logic.is_game_over(self.board, self.pieces)
         observation = self._get_observation()
-        info = {}
+        info = {'scores': self.scores}
         return observation, reward, done, done, info
 
-    def render(self, mode='human'):
+    def render(self):
         """
         Render the environment.
 
@@ -116,6 +126,7 @@ class BlokusEnv(gym.Env):
         Returns:
         - img (np.ndarray): Rendered image if mode is 'rgb_array'.
         """
+
         img = self.renderer.render(self.board, self.pieces)
         return img
 

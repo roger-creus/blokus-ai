@@ -1,8 +1,9 @@
 BOARD_SIZE = 20
+WINDOW_SIZE = BOARD_SIZE*30
 NUM_PLAYERS = 4
-INITIAL_POSITIONS = [(0, 0), (0, 19), (19, 0), (19, 19)]
+INITIAL_POSITIONS = [(0, 0), (0, BOARD_SIZE-1), (BOARD_SIZE-1, 0), (BOARD_SIZE-1, BOARD_SIZE-1)]
 PLAYER_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-
+COLORS = ["red", "green", "blue", "yellow"]
 PIECES = {
     # Monomino
     'monomino': [(0, 0)],
