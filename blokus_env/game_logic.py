@@ -1,17 +1,15 @@
 import numpy as np
-from blokus_env.constants import PIECES
+from blokus_env.constants import PIECES, BOARD_SIZE, INITIAL_POSITIONS, NUM_PLAYERS
 
 class GameLogic:
     """
     Class containing the core game logic for the Blokus environment.
     """
-    def __init__(self, options):
+    def __init__(self):
         """
         Initialize the GameLogic class.
         """
-        
-        self.options = options
-        self.initial_positions = [(0, 0), (0, self.options["board_size"]-1), (self.options["board_size"]-1, 0), (self.options["board_size"]-1, self.options["board_size"]-1)]
+        pass
 
     def place_piece(self, board, pieces, player, piece_index, x, y, rotation, horizontal_flip=0, vertical_flip=0):
         """
@@ -119,7 +117,7 @@ class GameLogic:
         Returns:
         - bool: True if it is the first move, False otherwise.
         """
-        initial_position = self.initial_positions[player - 1]
+        initial_position = INITIAL_POSITIONS[player - 1]
         return board[initial_position] == 0
 
     def is_valid_move(self, board, pieces, player, piece_shape, x, y):
@@ -140,14 +138,14 @@ class GameLogic:
         # Ensure the piece is within the board boundaries and does not overlap existing pieces
         for dx, dy in piece_shape:
             px, py = x + dx, y + dy
-            if not (0 <= px < self.options["board_size"] and 0 <= py < self.options["board_size"]):
+            if not (0 <= px < BOARD_SIZE and 0 <= py < BOARD_SIZE):
                 return False
             if board[px, py] != 0:
                 return False
 
         # For the first move, the piece must cover the initial position
         if self.is_first_move(player, board):
-            initial_position = self.initial_positions[player - 1]
+            initial_position = INITIAL_POSITIONS[player - 1]
             if not any((x + dx, y + dy) == initial_position for dx, dy in piece_shape):
                 return False
         else:
@@ -182,8 +180,8 @@ class GameLogic:
                     for horizontal_flip in range(2):  # Horizontal flip (0 or 1)
                         for vertical_flip in range(2):  # Vertical flip (0 or 1)
                             piece_shape = self.get_piece_shape(piece_index, rotation, horizontal_flip, vertical_flip)
-                            for x in range(self.options["board_size"]):
-                                for y in range(self.options["board_size"]):
+                            for x in range(BOARD_SIZE):
+                                for y in range(BOARD_SIZE):
                                     if self.is_valid_move(board, pieces, player, piece_shape, x, y):
                                         valid_actions.append((piece_index, x, y, rotation, horizontal_flip, vertical_flip))
         return valid_actions
@@ -200,15 +198,15 @@ class GameLogic:
         Returns:
         - np.ndarray: Masks for invalid actions.
         """
-        invalid_action_masks = np.zeros((len(PIECES), self.options["board_size"], self.options["board_size"], 4, 2, 2))
+        invalid_action_masks = np.zeros((len(PIECES), BOARD_SIZE, BOARD_SIZE, 4, 2, 2))
         for piece_index in range(len(PIECES)):
             if pieces[player - 1, piece_index] == 1:
                 for rotation in range(4):
                     for horizontal_flip in range(2):
                         for vertical_flip in range(2):
                             piece_shape = self.get_piece_shape(piece_index, rotation, horizontal_flip, vertical_flip)
-                            for x in range(self.options["board_size"]):
-                                for y in range(self.options["board_size"]):
+                            for x in range(BOARD_SIZE):
+                                for y in range(BOARD_SIZE):
                                     if self.is_valid_move(board, pieces, player, piece_shape, x, y):
                                         invalid_action_masks[piece_index, x, y, rotation, horizontal_flip, vertical_flip] = 1
         return invalid_action_masks
@@ -225,11 +223,11 @@ class GameLogic:
         - bool: True if the game is over, False otherwise.
         """
         info = {}
-        for player in range(1, self.options["players"] + 1):
+        for player in range(1, NUM_PLAYERS + 1):
             for piece_index, available in enumerate(pieces[player - 1]):
                 if available:
-                    for x in range(self.options["board_size"]):
-                        for y in range(self.options["board_size"]):
+                    for x in range(BOARD_SIZE):
+                        for y in range(BOARD_SIZE):
                             for rotation in range(4):
                                 for horizontal_flip in range(2):  # Horizontal flip (0 or 1)
                                     for vertical_flip in range(2):  # Vertical flip (0 or 1)
@@ -260,7 +258,7 @@ class GameLogic:
             px, py = x + dx, y + dy
             for ax, ay in adjacent_corners:
                 cx, cy = px + ax, py + ay
-                if 0 <= cx < self.options["board_size"] and 0 <= cy < self.options["board_size"]:
+                if 0 <= cx < BOARD_SIZE and 0 <= cy < BOARD_SIZE:
                     if board[cx, cy] == player:
                         return True
         return False
@@ -284,7 +282,7 @@ class GameLogic:
             px, py = x + dx, y + dy
             for ax, ay in adjacent_sides:
                 sx, sy = px + ax, py + ay
-                if 0 <= sx < self.options["board_size"] and 0 <= sy < self.options["board_size"]:
+                if 0 <= sx < BOARD_SIZE and 0 <= sy < BOARD_SIZE:
                     if board[sx, sy] == player:
                         return True
         return False

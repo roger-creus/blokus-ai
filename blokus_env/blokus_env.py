@@ -9,7 +9,7 @@ class BlokusEnv(gym.Env):
     """
     Implementation of the Blokus board game as a Gymnasium RL environment.
     """
-    def __init__(self, render_mode='rgb_array', options=None):
+    def __init__(self, render_mode='rgb_array'):
         """
         Initialize the Blokus environment.
 
@@ -17,49 +17,35 @@ class BlokusEnv(gym.Env):
         - render_mode (str): Mode to render with ('human' or 'rgb_array').
         """
         self.metadata = {"render_modes": ['human', 'rgb_array'], "render_fps": 10}
-        # assert render_mode in self.metadata['render_modes'], f"Invalid render mode: {render_mode}"
+        assert render_mode in self.metadata['render_modes'], f"Invalid render mode: {render_mode}"
         self.render_mode = render_mode
-        # Manage the options for the environment (in case of custom board size, number of players, etc...)
-        if options is None:
-            self.options = {
-                "board_size": BOARD_SIZE,
-                "players": NUM_PLAYERS
-            }
-        else:
-            self.options = options
-            self.options.setdefault("board_size", BOARD_SIZE)
-            self.options.setdefault("players", NUM_PLAYERS)
-            if self.options["players"] > NUM_PLAYERS or self.options["players"] < 1:
-                raise ValueError(f"Invalid number of players: {self.options['players']}. Must be between 1 and {NUM_PLAYERS}.")
-
-
-
+        
         super(BlokusEnv, self).__init__()
 
-        print("BlokusEnv initialized with options:", self.options)
         # Define the observation space: the board state and the pieces each player has
         self.observation_space = spaces.Dict({
-            'board': spaces.Box(low=0, high=self.options["players"], shape=(self.options["board_size"], self.options["board_size"]), dtype=np.int8),
-            'pieces': spaces.MultiBinary(len(PIECES) * self.options["players"]),
-            'current_player': spaces.MultiBinary(self.options["players"])
+            'board': spaces.Box(low=0, high=NUM_PLAYERS, shape=(BOARD_SIZE, BOARD_SIZE), dtype=np.int8),
+            'pieces': spaces.MultiBinary(len(PIECES) * NUM_PLAYERS),
+            'current_player': spaces.MultiBinary(NUM_PLAYERS)
         })
 
         # Define the action space: (piece index, x, y, rotation, horizontal_flip, vertical_flip)
         self.action_space = spaces.Tuple((
             spaces.Discrete(len(PIECES)),  # Piece index
-            spaces.Discrete(self.options["board_size"]),   # X position
-            spaces.Discrete(self.options["board_size"]),   # Y position
+            spaces.Discrete(BOARD_SIZE),   # X position
+            spaces.Discrete(BOARD_SIZE),   # Y position
             spaces.Discrete(4),            # 4 rotations (0, 1, 2, 3 degrees)
             spaces.Discrete(2),            # Horizontal flip (0 or 1)
             spaces.Discrete(2)             # Vertical flip (0 or 1)
         ))
 
-        # Initialize the scores for each player
-        self.scores = np.zeros(self.options["players"], dtype=np.int8)
+        # Initialize the score for each player
+        # Logic of the score: +1 points for each square placed
+        self.scores = np.zeros(NUM_PLAYERS, dtype=np.int8)
 
         # Initialize the game logic and renderer
-        self.game_logic = GameLogic(options=self.options)
-        self.renderer = Renderer(options=self.options)
+        self.game_logic = GameLogic()
+        self.renderer = Renderer()
         self.reset()
 
     def reset(self, seed=None, options=None):
@@ -74,8 +60,8 @@ class BlokusEnv(gym.Env):
         - observation (dict): Initial observation of the environment.
         - info (dict): Additional info.
         """
-        self.board = np.zeros((self.options["board_size"], self.options["board_size"]), dtype=np.int8)
-        self.pieces = np.ones((self.options["players"], len(PIECES)), dtype=np.int8)
+        self.board = np.zeros((BOARD_SIZE, BOARD_SIZE), dtype=np.int8)
+        self.pieces = np.ones((NUM_PLAYERS, len(PIECES)), dtype=np.int8)
         self.current_player = 1
         return self._get_observation(), {"scores": self.scores}
 
@@ -117,14 +103,14 @@ class BlokusEnv(gym.Env):
                     horizontal_flip=horizontal_flip, vertical_flip=vertical_flip
                 )                
                 reward = -5  # Invalid move penalty
-                self.scores[self.current_player - 1] += len(PIECES[list(PIECES.keys())[piece_index]])
             else:
                 piece_name = list(PIECES.keys())[piece_index]
                 reward = len(PIECES[piece_name])
 
-                self.scores[self.current_player - 1] += reward*2
+            # Update the score of the player
+            self.scores[self.current_player - 1] += len(PIECES[list(PIECES.keys())[piece_index]])
             
-        self.current_player = (self.current_player % self.options["players"]) + 1
+        self.current_player = (self.current_player % NUM_PLAYERS) + 1
         done = self.game_logic.is_game_over(self.board, self.pieces)
         observation = self._get_observation()
         info = {'scores': self.scores}
@@ -140,8 +126,9 @@ class BlokusEnv(gym.Env):
         Returns:
         - img (np.ndarray): Rendered image if mode is 'rgb_array'.
         """
-        self.renderer.render(self.board, self.pieces)
 
+        img = self.renderer.render(self.board, self.pieces)
+        return img
 
     def _get_observation(self):
         """
@@ -153,5 +140,5 @@ class BlokusEnv(gym.Env):
         return {
             'board': self.board,
             'pieces': self.pieces.flatten().astype(np.int8),
-            'current_player': np.eye(self.options["players"])[self.current_player - 1].flatten().astype(np.int8)
+            'current_player': np.eye(NUM_PLAYERS)[self.current_player - 1].flatten().astype(np.int8)
         }

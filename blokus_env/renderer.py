@@ -1,18 +1,15 @@
 import pygame
 import numpy as np
-from blokus_env.constants import PLAYER_COLORS
+from blokus_env.constants import PLAYER_COLORS, BOARD_SIZE, WINDOW_SIZE
 
 class Renderer:
-    def __init__(self, options):
+    def __init__(self):
         """
         Initialize the Renderer with a Pygame screen and set up the display.
         """
         pygame.init()
-        self.board_size = options["board_size"]
 
-        self.window_size = self.board_size * 30
-
-        self.screen = pygame.display.set_mode((self.window_size, self.window_size))
+        self.screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
         pygame.display.set_caption('Blokus')
         self.clock = pygame.time.Clock()
 
@@ -38,10 +35,10 @@ class Renderer:
         """
         Draw the grid lines on the board.
         """
-        for x in range(0, self.window_size, 30):
-            pygame.draw.line(self.screen, (0, 0, 0), (x, 0), (x, self.window_size))
-        for y in range(0, self.window_size, 30):
-            pygame.draw.line(self.screen, (0, 0, 0), (0, y), (self.window_size, y))
+        for x in range(0, WINDOW_SIZE, 30):
+            pygame.draw.line(self.screen, (0, 0, 0), (x, 0), (x, WINDOW_SIZE))
+        for y in range(0, WINDOW_SIZE, 30):
+            pygame.draw.line(self.screen, (0, 0, 0), (0, y), (WINDOW_SIZE, y))
 
     def draw_pieces(self, board):
         """
@@ -50,8 +47,8 @@ class Renderer:
         Parameters:
         - board (np.ndarray): The current board state.
         """
-        for x in range(self.board_size):
-            for y in range(self.board_size):
+        for x in range(BOARD_SIZE):
+            for y in range(BOARD_SIZE):
                 if board[x, y] != 0:
                     color = PLAYER_COLORS[board[x, y] - 1]
                     pygame.draw.rect(
